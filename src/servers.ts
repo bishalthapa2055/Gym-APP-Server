@@ -38,7 +38,7 @@ app.use(
 // app.use(decodeIDToken);
 
 mongoose
-  .connect(config.mongo.url, {
+  .connect(config.mongo.url!, {
     retryWrites: true,
     w: "majority",
   })
