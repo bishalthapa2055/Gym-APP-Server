@@ -1,0 +1,38 @@
+{
+  "name": "11tsc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/servers.ts",
+  "scripts": {
+    "build": "npm run tsc",
+    "start": "node build/servers.js",
+    "tsc": "tsc -p tsconfig.json",
+    "server": "ts-node-dev src/servers.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "firebase": "^9.13.0",
+    "firebase-admin": "^11.2.0",
+    "mongodb": "^4.11.0",
+    "mongoose": "^6.7.1",
+    "multer": "^1.4.5-lts.1",
+    "ts-node-dev": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.14",
+    "@types/firebase": "^3.2.1",
+    "@types/mongoose": "^5.11.97",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^18.11.9",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
+  }
+}
