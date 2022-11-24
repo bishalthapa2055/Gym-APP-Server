@@ -43,6 +43,7 @@ const verifyTokenAndAuthorization = (
 ) => {
   decodeIDToken(req, res, () => {
     const number = res.locals.number.phone_number;
+    console.log(number);
     Users.findOne({ phone: number }, (err: any, data: any) => {
       try {
         // console.log(phone);

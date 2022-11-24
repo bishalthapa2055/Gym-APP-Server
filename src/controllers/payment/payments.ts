@@ -8,9 +8,9 @@ const displayPayment = async (
   next: NextFunction
 ) => {
   await Payment.find({})
-    // .populate("userId", "email")
-    // .populate("processed_by", "email")
-    .populate("packages")
+    .populate("userId", "phone")
+    .populate("processed_by", "name")
+    .populate("packages", "name")
     .then((data) => {
       res.status(200).json({ status: true, data: data });
     })
@@ -37,7 +37,7 @@ const addPayment = async (req: Request, res: Response, next: NextFunction) => {
 const updatePayments = (req: Request, res: Response, next: NextFunction) => {
   Payment.findOneAndUpdate(
     { _id: req.params.id },
-    // { $push: { packages: req.body.packageId } },
+    // { $push: { userId: req.body.userId } },
     // { $push: { packages: req.body.packageId } },
     { $push: { processed_by: req.body.userId } },
     (err: any, docs: any) => {

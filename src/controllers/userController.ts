@@ -78,15 +78,13 @@ const updateUsers = (req: Request, res: Response, next: NextFunction) => {
   );
 };
 
-const getIndividualUsers: any = async (
+const getIndividualUsers = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  // const id = req.params.id;
-  const number = req.params.id;
-  // await Users.findById({ id })
-  await Users.find({ phone: number })
+  const id = req.params.id;
+  await Users.findById(id)
     .then((user: any) =>
       user
         ? res.status(200).json({ status: true, data: user })

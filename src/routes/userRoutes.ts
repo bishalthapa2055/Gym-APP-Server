@@ -33,7 +33,7 @@ router.get(
 router.post(
   "/create",
   upload,
-  verifyTokenAndIsAdmin,
+  // verifyTokenAndIsAdmin,
   userController.createUsers
 );
 

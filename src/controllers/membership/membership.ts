@@ -10,7 +10,7 @@ const displayMembership = (req: Request, res: Response, next: NextFunction) => {
   // Membership.create({ package: { name: "gbdsg" } });
 
   Membership.find({})
-    .populate("userId", "email")
+    .populate("userId", "phone")
     .populate("package", "name")
     .populate("payment", "paid_via")
     .exec((err, docs) => {
@@ -49,9 +49,9 @@ const updateMembership = (req: Request, res: Response, next: NextFunction) => {
   Membership.findOneAndUpdate(
     // { _id: req.params.id },
     { _id: req.params.id.trim() },
-    // { $push: { userId: req.body.userId } },
+    { $push: { userId: req.body.userId } },
     // { package: req.body.packageId },
-    { payment: req.body.paymentId },
+    // { payment: req.body.paymentId },
     { new: true },
     (err, docs) => {
       {
