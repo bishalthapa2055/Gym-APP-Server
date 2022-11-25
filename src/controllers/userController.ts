@@ -27,6 +27,10 @@ const createUsers = async (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
+const aggregrate = (req: Request, res: Response, next: NextFunction) => {
+  // aggregration
+};
+
 const displayUsers = async (
   req: Request,
   res: Response,
