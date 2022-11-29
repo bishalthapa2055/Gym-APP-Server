@@ -20,13 +20,13 @@ router.get(
 router.get(
   "/displays/:id",
   // verifyTokenAndAuthorization,
-  verifyTokenAndIsAdmin,
+  // verifyTokenAndIsAdmin,
   userController.getIndividualUsers
 );
 
 router.get(
   "/display/me",
-  verifyTokenAndAuthorization,
+  // verifyTokenAndAuthorization,
   userController.displayMe
 );
 
@@ -38,7 +38,11 @@ router.post(
 );
 
 router.get("/users/count", userController.countUser);
-router.delete("/delete/:id", verifyTokenAndIsAdmin, userController.deleteUsers);
+router.delete(
+  "/delete/:id",
+  // verifyTokenAndIsAdmin,
+  userController.deleteUsers
+);
 router.patch("/update/:id", upload, userController.updateUsers);
 router.get("/lookup", userController.aggregrate);
 
