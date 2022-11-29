@@ -40,5 +40,6 @@ router.post(
 router.get("/users/count", userController.countUser);
 router.delete("/delete/:id", verifyTokenAndIsAdmin, userController.deleteUsers);
 router.patch("/update/:id", upload, userController.updateUsers);
+router.get("/lookup", userController.aggregrate);
 
 export default router;

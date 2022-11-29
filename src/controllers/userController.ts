@@ -29,6 +29,28 @@ const createUsers = async (req: Request, res: Response, next: NextFunction) => {
 
 const aggregrate = (req: Request, res: Response, next: NextFunction) => {
   // aggregration
+  //   db.students.aggregate([
+  // {
+  // $lookup:
+  // {
+  // from : “sports”,
+  // localField : “pupil”,
+  // foreignField : “winner”,
+  // as : “games”
+  // } } ] )
+
+  const data = Users.aggregate([
+    {
+      $lookup: {
+        from: "Membership",
+        localField: "_id",
+        foreignField: "Users",
+        as: "conversion",
+      },
+    },
+  ]);
+  res.status(200).json({ status: true, data: data });
+  console.log(data);
 };
 
 const displayUsers = async (
@@ -176,6 +198,16 @@ const countUser = async (req: Request, res: Response, next: NextFunction) => {
   const user = await Users.find({}).count();
   res.send({ status: true, count: user });
 };
+const login = async (req: Request, res: Response, next: NextFunction) => {
+  //login credentials
+  const number = res.locals.number.name;
+  // console.log(number);
+  if (number) {
+    res.status(200).json({ status: true, message: `Welcome : ${number}` });
+  } else {
+    res.status(400).json({ status: false, message: "Not a valid user number" });
+  }
+};
 
 export default {
   createUsers,
@@ -186,4 +218,6 @@ export default {
   displayMe,
   updateMyDetails,
   countUser,
+  aggregrate,
+  login,
 };
