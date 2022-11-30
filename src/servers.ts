@@ -10,7 +10,7 @@ import paymentRoutes from "./routes/paymentRoutes";
 import bodyParser from "body-parser";
 import tokenRoutes from "./routes/tokenRoutes";
 import adminRoutes from "./routes/adminRoutes";
-// import decodeIDToken from "./authenticationToken";
+// import { decodeIDToken } from "./authenticationToken";
 // import verifyTokenAndAuthorization from "./authenticationToken";
 // import verifyPhone from "./middleware/verifyPhone";
 import { Users } from "./routes/Users";

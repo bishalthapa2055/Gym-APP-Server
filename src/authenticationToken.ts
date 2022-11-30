@@ -1,6 +1,7 @@
 import admin from "firebase-admin";
 import { Request, Response, NextFunction } from "express";
 import Users from "./models/Users";
+import jwt from "jsonwebtoken";
 
 const serviceAccount = require("./serviceAccount.json");
 admin.initializeApp({
@@ -18,11 +19,25 @@ async function decodeIDToken(req: any, res: Response, next: NextFunction) {
     const idToken = req.headers.authorization.split("Bearer ")[1];
     // console.log(idToken);
     try {
-      const decodedToken = await admin.auth().verifyIdToken(idToken);
-      console.log(decodedToken);
+      // const decodedToken = await admin.auth().verifyIdToken(idToken);
+      // console.log(decodedToken);
+
+      const jwtDecodedToken = jwt.decode(idToken);
+      console.log(jwtDecodedToken, ["decoded"]);
+      // console.log(jwtDecodedToken);
+      /*
+
       if (decodedToken) {
         req.currentUser = decodedToken;
         res.locals.number = req.currentUser;
+        // console.log(res.locals.number);
+        next();
+      }
+      */
+      if (jwtDecodedToken) {
+        req.currentUser = jwtDecodedToken;
+        res.locals.number = req.currentUser;
+        console.log(res.locals.number);
         next();
       } else {
         res.send("Token verification Failed");
@@ -36,6 +51,8 @@ async function decodeIDToken(req: any, res: Response, next: NextFunction) {
   }
   // next();
 }
+/*
+
 const verifyTokenAndAuthorization = (
   req: Request,
   res: Response,
@@ -59,6 +76,37 @@ const verifyTokenAndAuthorization = (
       } catch (err) {
         console.log("Error :" + err);
         // res.status(400).json({ status: false, message: "Cannot find User" });
+      }
+    });
+  });
+};
+
+*/
+const verifyTokenAndAuthorization = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  decodeIDToken(req, res, () => {
+    const number = res.locals.number.phone_number;
+    console.log(number, ["number"]);
+    Users.findOne({ phone: number }, (err: any, data: any) => {
+      try {
+        // console.log(phone);
+        if (err) {
+          res
+            .status(400)
+            .json({ status: false, message: "Cannot found user data" });
+        } else {
+          console.log(data);
+          res.locals.number = data;
+          next();
+        }
+      } catch (err) {
+        // console.log("Error :" + err);
+        res
+          .status(400)
+          .json({ status: false, message: "Cannot find User", Error: err });
       }
     });
   });
