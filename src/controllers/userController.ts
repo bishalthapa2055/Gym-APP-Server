@@ -1,19 +1,30 @@
-import Users from "../models/Users";
 import fs from "fs";
 import { NextFunction, Request, Response } from "express";
+import Users from "../models/Users";
+import { BadRequestError } from "../errors/bad_request_error";
+import moment from "moment";
+import { ApiFeatures } from "../utils/api-services";
 // import decodeIDToken from "../authenticationToken";
 
 const createUsers = async (req: Request, res: Response, next: NextFunction) => {
   console.log(req.body);
+  const date = new Date();
+  const formattedDate = moment(date).format("YYYY-MM-DD");
+  console.log(
+    "🚀 ~ file: userController.ts:12 ~ createUsers ~ formattedDate",
+    formattedDate
+  );
+  // console.log(req.file);
   const user = new Users({
     //user-> model
     name: req.body.name,
     email: req.body.email,
     phone: req.body.phone,
-    image: req.file?.filename,
-    // image: req.body.image,
-    isAdmin: req.body.isAdmin,
+    // image: req.file?.filename,
+    // image: req.file?.filename,
+    // isAdmin: req.body.isAdmin,
     emergency_number: req.body.emergency_number,
+    created: formattedDate,
   });
 
   // user = JSON.parse(user);
@@ -21,6 +32,9 @@ const createUsers = async (req: Request, res: Response, next: NextFunction) => {
   await user.save((err) => {
     if (err) {
       res.status(400).json({ message: err.message, type: "danger" });
+      // throw new BadRequestError((err as any).message)
+      //   ? (err as any).message
+      //   : "Failed to get Users. Consult to backend ";
     } else {
       res.status(200).json({ status: true, data: user });
     }
@@ -58,16 +72,20 @@ const displayUsers = async (
   res: Response,
   next: NextFunction
 ) => {
-  return await Users.find()
+  return await Users.find({ isAdmin: !true })
     .then((data: any) => {
       res.status(200).json({ status: true, data: data });
     })
     .catch((err: any) => {
-      res.status(400).json({ status: false, Error: err });
+      // res.status(400).json({ status: false, Error: err });
+      throw new BadRequestError((err as any).message)
+        ? (err as any).message
+        : "Failed to get Users. Consult to backend ";
     });
 };
 
-const updateUsers = (req: Request, res: Response, next: NextFunction) => {
+const updateUsers = async (req: Request, res: Response, next: NextFunction) => {
+  // const { name, email, phone, emergency_number } = req.body;
   const id = req.params.id;
   let new_image = "";
 
@@ -92,8 +110,9 @@ const updateUsers = (req: Request, res: Response, next: NextFunction) => {
       email: req.body.email,
       phone: req.body.phone,
       emergency_number: req.body.emergency_number,
-      image: new_image,
+      // image: new_image,
     },
+    { new: true },
     (err, result) => {
       if (err) {
         res.json({ message: err.message, type: "danger" });
@@ -118,25 +137,33 @@ const getIndividualUsers = async (
             .status(400)
             .json({ status: false, message: "No user is available" })
     )
-    .catch((err: any) => res.status(400).json({ status: false, message: err }));
+    .catch((err: any) => {
+      res
+        .status(400)
+        .json({ status: false, message: "Unable to find the user" });
+
+      // throw new BadRequestError("Failed to get Users. Consult to backend ");
+    });
 };
 
 const deleteUsers = async (req: Request, res: Response, next: NextFunction) => {
   let id = req.params.id;
   Users.findByIdAndDelete(id, (err: any, result: any) => {
-    if (result.image != "") {
-      //if image is not empty
-      try {
-        fs.unlinkSync("E:/11tsc/src/imagemodel/imageuploads/" + result.image);
-      } catch (err) {
-        console.log(err);
-      }
-    }
+    // if (result.image != "") {
+    //   //if image is not empty
+    //   try {
+    //     fs.unlinkSync("E:/11tsc/src/imagemodel/imageuploads/" + result.image);
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // }
 
     if (err) {
       res.json({ message: err.message });
     } else {
-      res.status(200).json({ status: true, message: "sucessfully deleted" });
+      res
+        .status(200)
+        .json({ status: true, message: "sucessfully deleted", data: result });
     }
   });
 };
@@ -198,20 +225,95 @@ const countUser = async (req: Request, res: Response, next: NextFunction) => {
   // to count number of users in our gym
   // const user = await Users.find({}).count();
   // console.log("hit");
-  const user = await Users.find({}).count();
+  const user = await Users.find({ isAdmin: !true }).count();
   res.send({ status: true, count: user });
 };
 const login = async (req: Request, res: Response, next: NextFunction) => {
   //login credentials
   const number = res.locals.number.name;
+  const data = res.locals.number;
   // console.log(number);
-  if (number) {
-    res.status(200).json({ status: true, message: `Welcome : ${number}` });
-  } else {
-    res.status(400).json({ status: false, message: "Not a valid user number" });
+  try {
+    if (number) {
+      res.status(200).json({
+        status: true,
+        message: `Welcome : ${number}`,
+        isAdmin: data.isAdmin,
+        data: data,
+      });
+    } else {
+      res.status(400).json({
+        status: false,
+        message: "Not a valid user number",
+        data: data,
+      });
+    }
+  } catch (err: any) {
+    res.status(400).json({ status: false, message: err.message });
   }
 };
+const admin = (req: Request, res: Response, next: NextFunction) => {
+  const data = res.locals.number;
+  if (data) {
+    console.log(data.phone);
+    res.status(200).json({
+      status: true,
+      message: "Welcome admin",
+      isAdmin: data.isAdmin,
+      datas: data,
+    });
+  }
+};
+const searchUser = async (req: Request, res: Response, next: NextFunction) => {
+  // searching the users
+  try {
+    let documentCount = await Users.estimatedDocumentCount();
+    const searchTerm = req.query.searchTerm as string | undefined;
 
+    // advance features within users
+    let features: ApiFeatures;
+    if (searchTerm) {
+      features = new ApiFeatures(
+        Users.find({
+          $and: [
+            {
+              name: {
+                $regex: searchTerm,
+                $options: "xi",
+              },
+              isAdmin: false,
+              // isAdmin: {
+              //   $regex: false,
+              // },
+            },
+          ],
+        }),
+        req.query
+      )
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+    } else {
+      features = new ApiFeatures(Users.find(), req.query)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+    }
+    let doc = await features.query;
+
+    res.status(200).json({
+      result: doc.length,
+      total: documentCount,
+      data: doc,
+    });
+  } catch (error) {
+    throw new BadRequestError(
+      (error as any).message ? (error as any).message : "failed to get Users "
+    );
+  }
+};
 export default {
   createUsers,
   displayUsers,
@@ -223,4 +325,6 @@ export default {
   countUser,
   aggregrate,
   login,
+  admin,
+  searchUser,
 };

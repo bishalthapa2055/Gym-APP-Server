@@ -1,6 +1,9 @@
+import { json } from "body-parser";
 import { Request, Response, NextFunction } from "express";
+import { BadRequestError } from "../../errors/bad_request_error";
 import Packages from "../../models/Packages";
 import Payment from "../../models/Payment";
+import { ApiFeatures } from "../../utils/api-services";
 
 const displayPackages = (req: Request, res: Response, next: NextFunction) => {
   Packages.find({}).exec((err, docs) => {
@@ -49,19 +52,38 @@ const getIndividualPackage = async (
 
 const updatePackages = async (req: Request, res: Response) => {
   var id = req.params.id;
-  await Packages.findByIdAndUpdate(id, {
-    discount_percentage: req.body.discount_percentage,
-    duration_in_days: req.body.duration_in_days,
-    name: req.body.name,
-    photo_url: req.body.photo_url,
-    price: req.body.price,
-  })
-    .then((data) => {
-      res.status(400).json({ status: true, data: data });
-    })
-    .catch((err) => {
-      res.status(500).json({ status: false });
-    });
+
+  const { discount_percentage, duration_in_days, name, price, status } =
+    req.body;
+  const isExistPackage = await Packages.findById(id);
+  if (!isExistPackage) {
+    throw new BadRequestError("cannot find package");
+  }
+  isExistPackage.discount_percentage =
+    discount_percentage || isExistPackage.discount_percentage;
+  isExistPackage.duration_in_days =
+    duration_in_days || isExistPackage.duration_in_days;
+  isExistPackage.name = name || isExistPackage.name;
+  isExistPackage.price = price || isExistPackage.price;
+  // isExistPackage.status = status || isExistPackage.status;
+  isExistPackage.status = status || isExistPackage.status;
+
+  await isExistPackage.save();
+  res.status(200).json({
+    data: isExistPackage,
+  });
+
+  try {
+  } catch {
+    throw new BadRequestError("failed to update");
+  }
+};
+const statusCheck = (req: Request, res: Response, next: NextFunction) => {
+  Packages.find({ status: "published" }).exec((err, docs) => {
+    if (err) throw err;
+
+    res.status(200).json({ stautus: true, data: docs });
+  });
 };
 
 const deletePackages = async (
@@ -72,7 +94,7 @@ const deletePackages = async (
   const id = req.params.id;
   await Packages.findByIdAndRemove(id)
     .then((data) => {
-      res.status(400).json({ status: true, data: data });
+      res.status(200).json({ status: true, data: data });
     })
     .catch((err) => {
       res.status(500).json({ status: false });
@@ -118,12 +140,97 @@ const updateMyPackage = async (
     price: req.body.price,
   })
     .then((data) => {
-      res.status(400).json({ status: true, data: data });
+      res.status(200).json({ status: true, data: data });
     })
     .catch((err) => {
-      res.status(500).json({ status: false });
+      res.status(400).json({ status: false });
     });
 };
+const updateStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  var id = req.params.id;
+
+  const { status } = req.body;
+  const isExistPackage = await Packages.findById(id);
+  if (!isExistPackage) {
+    throw new BadRequestError("cannot find package");
+  }
+
+  // isExistPackage.status = status || isExistPackage.status;
+  isExistPackage.status = status || isExistPackage.status;
+
+  await isExistPackage.save();
+  res.status(200).json({
+    data: isExistPackage,
+  });
+
+  try {
+  } catch {
+    throw new BadRequestError("failed to update");
+  }
+};
+
+const searchPublishedPackage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // searching the packages
+  try {
+    let documentCount = await Packages.estimatedDocumentCount();
+    const searchTerm = req.query.searchTerm as string | undefined;
+
+    // advance features within users
+    let features: ApiFeatures;
+    if (searchTerm) {
+      features = new ApiFeatures(
+        Packages.find({
+          $and: [
+            {
+              name: {
+                $regex: searchTerm,
+                $options: "xi",
+              },
+              status: {
+                $regex: "published",
+                $options: "xi",
+              },
+              // u: id,
+            },
+          ],
+        }),
+        req.query
+      )
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+    } else {
+      features = new ApiFeatures(Packages.find(), req.query)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+    }
+    let doc = await features.query;
+
+    res.status(200).json({
+      result: doc.length,
+      total: documentCount,
+      data: doc,
+    });
+  } catch (error) {
+    throw new BadRequestError(
+      (error as any).message
+        ? (error as any).message
+        : "failed to get Packages "
+    );
+  }
+};
+
 export default {
   displayPackages,
   addPackages,
@@ -132,4 +239,7 @@ export default {
   deletePackages,
   getMyPackage,
   updateMyPackage,
+  statusCheck,
+  updateStatus,
+  searchPublishedPackage,
 };

@@ -2,6 +2,8 @@ import admin from "firebase-admin";
 import { Request, Response, NextFunction } from "express";
 import Users from "./models/Users";
 import jwt from "jsonwebtoken";
+import { async } from "@firebase/util";
+import { NotAuthorizedError } from "./errors/not_authorized_error";
 
 const serviceAccount = require("./serviceAccount.json");
 admin.initializeApp({
@@ -19,78 +21,51 @@ async function decodeIDToken(req: any, res: Response, next: NextFunction) {
     const idToken = req.headers.authorization.split("Bearer ")[1];
     // console.log(idToken);
     try {
-      // const decodedToken = await admin.auth().verifyIdToken(idToken);
-      // console.log(decodedToken);
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      console.log(decodedToken);
 
-      const jwtDecodedToken = jwt.decode(idToken);
-      console.log(jwtDecodedToken, ["decoded"]);
+      // const jwtDecodedToken = jwt.decode(idToken);
+      // console.log(idToken);
+      // console.log(jwtDecodedToken, ["decoded"]);
       // console.log(jwtDecodedToken);
-      /*
 
       if (decodedToken) {
         req.currentUser = decodedToken;
         res.locals.number = req.currentUser;
-        // console.log(res.locals.number);
-        next();
-      }
-      */
-      if (jwtDecodedToken) {
-        req.currentUser = jwtDecodedToken;
-        res.locals.number = req.currentUser;
         console.log(res.locals.number);
         next();
-      } else {
-        res.send("Token verification Failed");
+      }
+
+      // if (jwtDecodedToken) {
+      //   req.currentUser = jwtDecodedToken;
+      //   res.locals.number = req.currentUser;
+      //   console.log(res.locals.number);
+      //   next();
+      // }
+      else {
+        res.status(404).send("Token Decode failed  !!!!");
       }
     } catch (err) {
-      console.log(err);
-      res
-        .status(400)
-        .json({ status: false, message: "Firebase ID  token Expired" });
+      // console.log(err);
+      res.status(400).json({
+        status: false,
+        message: "Firebase ID  token Expired / Token verification failed ",
+      });
     }
   }
   // next();
 }
-/*
 
+/*
 const verifyTokenAndAuthorization = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  decodeIDToken(req, res, () => {
+  decodeIDToken(req, res, async () => {
     const number = res.locals.number.phone_number;
     console.log(number);
-    Users.findOne({ phone: number }, (err: any, data: any) => {
-      try {
-        // console.log(phone);
-        if (err) {
-          res
-            .status(400)
-            .json({ status: false, message: "Cannot found user data" });
-        } else {
-          console.log(data);
-          res.locals.number = data;
-          next();
-        }
-      } catch (err) {
-        console.log("Error :" + err);
-        // res.status(400).json({ status: false, message: "Cannot find User" });
-      }
-    });
-  });
-};
-
-*/
-const verifyTokenAndAuthorization = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  decodeIDToken(req, res, () => {
-    const number = res.locals.number.phone_number;
-    console.log(number, ["number"]);
-    Users.findOne({ phone: number }, (err: any, data: any) => {
+    await Users.findOne({ phone: number }, (err: any, data: any) => {
       try {
         // console.log(phone);
         if (err) {
@@ -104,11 +79,48 @@ const verifyTokenAndAuthorization = (
         }
       } catch (err) {
         // console.log("Error :" + err);
-        res
-          .status(400)
-          .json({ status: false, message: "Cannot find User", Error: err });
+        res.status(400).json({ status: false, message: "Cannot find User" });
       }
     });
+  });
+};
+*/
+
+const verifyTokenAndAuthorization = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  decodeIDToken(req, res, () => {
+    const number = res.locals.number.phone_number;
+    console.log(number, ["number"]);
+    try {
+      Users.findOne({ phone: number }, (err: any, data: any) => {
+        // try {
+        // console.log(phone);
+        if (err) {
+          // console.log(err, ["err"]);
+          res
+            .status(400)
+            .json({ status: false, message: "Cannot found user data" });
+          // throw new Error("Cannot find data");
+        } else {
+          console.log(data);
+          res.locals.number = data;
+          next();
+        }
+        // } catch (err) {
+        // console.log("Error :" + err);
+        // res
+        // .status(400)
+        // .json({ status: false, message: "Cannot find Valid users" });
+        // }
+      });
+    } catch (e) {
+      res
+        .status(400)
+        .json({ status: false, message: "Cannot View Your Details" });
+    }
   });
 };
 
@@ -117,11 +129,11 @@ const verifyTokenAndIsAdmin = (
   res: Response,
   next: NextFunction
 ) => {
-  decodeIDToken(req, res, () => {
+  decodeIDToken(req, res, async () => {
     //processing for admin
     const number = res.locals.number.phone_number;
 
-    Users.findOne({ phone: number }, (err: any, data: any) => {
+    await Users.findOne({ phone: number }, (err: any, data: any) => {
       try {
         if (err) {
           res
@@ -130,19 +142,29 @@ const verifyTokenAndIsAdmin = (
         } else {
           // console.log(data);
           res.locals.number = data;
-          if (res.locals.number.isAdmin) {
+          if (res.locals.number.isAdmin === true) {
             next();
-          } else {
-            res
-              .status(400)
-              .json({ status: false, message: "You are not allowded" });
+          } else if (res.locals.number.isAdmin === false) {
+            res.status(400).json({
+              status: false,
+              message: "You are not allowded",
+              data: data,
+            });
           }
         }
       } catch (err) {
-        console.log("Error :" + err);
+        // console.log("Error :" + err);
+        res.status(400).json({
+          status: false,
+          message: "You are not allowded to do that",
+          data: data,
+        });
+        // throw new NotAuthorizedError();
         // res.status(400).json({ status: false, message: "Cannot find User" });
       }
-    });
+    })
+      .clone()
+      .exec();
   });
 };
 

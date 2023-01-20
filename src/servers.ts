@@ -71,4 +71,7 @@ function startServer() {
   app.get("/", (req, res) => {
     res.send({ status: true, message: "ok" });
   });
+  app.all("*", (req, res) => {
+    res.status(400).json({ status: false, message: "Not valid route" });
+  });
 }

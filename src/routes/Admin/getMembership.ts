@@ -5,7 +5,11 @@ import Membership from "../../controllers/membership/membership";
 const router = express.Router();
 
 router.get("/membership", verifyTokenAndIsAdmin, Membership.displayMembership);
-router.get("/membership/count", Membership.countMembership);
+router.get(
+  "/membership/count",
+  verifyTokenAndIsAdmin,
+  Membership.countMembership
+);
 router.post("/membership", verifyTokenAndIsAdmin, Membership.addMembership);
 router.delete(
   "/membership/:id",

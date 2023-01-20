@@ -103,6 +103,7 @@
   "include": [
     "src/**/**.ts",
     "src/config/firebase.ts",
-    "src/serviceAccount.json"
+    "src/serviceAccount.json",
+    "src/services"
   ]
 }

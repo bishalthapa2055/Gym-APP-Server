@@ -45,5 +45,7 @@ router.delete(
 );
 router.patch("/update/:id", upload, userController.updateUsers);
 router.get("/lookup", userController.aggregrate);
+router.get("/search", userController.searchUser);
+router.get("/paginate");
 
 export default router;
