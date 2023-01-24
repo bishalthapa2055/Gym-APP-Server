@@ -17,4 +17,5 @@ router.put("/memberships/:id", Membership.updateMembership);
 router.put("/membershipss/:id", Membership.updateMembershipPackage);
 router.patch("/memberships/:id", Membership.patchMembership);
 router.delete("/memberships/:id", Membership.deleteMembership);
+router.get("memberships/search", Membership.paginateMembership);
 export default router;

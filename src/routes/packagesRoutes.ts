@@ -10,4 +10,5 @@ router.get("/package/check", Packages.statusCheck);
 router.patch("/updateStatus/:id", Packages.updateStatus);
 // router.get("/searchpublished", Packages.searchPublishedPackage);
 router.get("/published", Packages.searchPublishedPackage);
+router.get("/searchPackage", Packages.searchPackages);
 export default router;

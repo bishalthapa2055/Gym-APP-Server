@@ -198,6 +198,7 @@ const searchPublishedPackage = async (
                 $regex: "published",
                 $options: "xi",
               },
+              // status: "published",
               // u: id,
             },
           ],
@@ -209,7 +210,10 @@ const searchPublishedPackage = async (
         .limitFields()
         .paginate();
     } else {
-      features = new ApiFeatures(Packages.find(), req.query)
+      features = new ApiFeatures(
+        Packages.find({ status: "published" }),
+        req.query
+      )
         .filter()
         .sort()
         .limitFields()
@@ -231,6 +235,55 @@ const searchPublishedPackage = async (
   }
 };
 
+const searchPackages = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    //for searhcing and getting data for pagination
+    let documentCount = await Packages.estimatedDocumentCount();
+    const searchTerm = req.query.searchTerm as string | undefined;
+    let features: ApiFeatures;
+    if (searchTerm) {
+      features = new ApiFeatures(
+        Packages.find({
+          $and: [
+            {
+              name: {
+                $regex: searchTerm,
+                $options: "xi",
+              },
+            },
+          ],
+        }),
+        req.query
+      )
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+    } else {
+      features = new ApiFeatures(Packages.find(), req.query)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+    }
+
+    let doc = await features.query;
+    res.status(200).json({
+      result: doc.length,
+      total: documentCount,
+      data: doc,
+    });
+  } catch (error) {
+    throw new BadRequestError(
+      (error as any).message ? (error as any).message : "Faild to get Packages"
+    );
+  }
+};
+
 export default {
   displayPackages,
   addPackages,
@@ -242,4 +295,5 @@ export default {
   statusCheck,
   updateStatus,
   searchPublishedPackage,
+  searchPackages,
 };

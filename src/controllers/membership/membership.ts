@@ -8,6 +8,7 @@ import {
 } from "../../authenticationToken";
 import mongoose from "mongoose";
 import { BadRequestError } from "../../errors/bad_request_error";
+import { ApiFeatures } from "../../utils/api-services";
 const displayMembership = (req: Request, res: Response, next: NextFunction) => {
   // Membership.create({ package: { name: "gbdsg" } });
 
@@ -213,12 +214,39 @@ const countMembership = async (
   res.status(200).json({ status: true, count: membership });
 };
 
-const searchMembership = async (
+const paginateMembership = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   // searching items
+
+  // try {
+  let documentCount = await Membership.estimatedDocumentCount();
+  const searchTerm = req.query.searchTerm as string | undefined;
+
+  //   let features : ApiFeatures;
+  //   if(searchTerm{
+  //     features = new ApiFeatures(
+  //       Membership.find({
+  //         $and :[
+  //           {
+  //             name :{
+  //               $regex : searchTerm,
+  //               $option :"xi"
+  //            }
+  //           }
+  //         ]
+  //       })
+  //     )
+  //   })
+  // } catch (error) {
+  //   throw new BadRequestError(
+  //     (error as any).message
+  //       ? (error as any).message
+  //       : "failed to get Memberships"
+  //   );
+  // }
 };
 export default {
   displayMembership,
@@ -230,5 +258,5 @@ export default {
   getIndividualMembership,
   displayMyMembership,
   countMembership,
-  searchMembership,
+  paginateMembership,
 };
