@@ -41,7 +41,7 @@ const createUsers = async (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
-const aggregrate = (req: Request, res: Response, next: NextFunction) => {
+const aggregrate = async (req: Request, res: Response, next: NextFunction) => {
   // aggregration
   //   db.students.aggregate([
   // {
@@ -53,18 +53,39 @@ const aggregrate = (req: Request, res: Response, next: NextFunction) => {
   // as : “games”
   // } } ] )
 
-  const data = Users.aggregate([
-    {
-      $lookup: {
-        from: "Membership",
-        localField: "_id",
-        foreignField: "Users",
-        as: "conversion",
-      },
-    },
+  // const data = Users.aggregate([
+  //   {
+  //     $lookup: {
+  //       from: "Membership",
+  //       localField: "_id",
+  //       foreignField: "Users",
+  //       as: "conversion",
+  //     },
+  //   },
+  // ]);
+  // res.status(200).json({ status: true, data: data });
+  // console.log(data);
+  //matching of datas
+  const data = await Users.aggregate([
+    // {
+    //   $group: {
+    //     _id: { name: "$name", phone: "$phone", isAdmin: "$isAdmin" },
+    //   },
+    // },
+    // // { $match: { "_id.isAdmin": false } },
+    // { $count: "_id" },
+    // { $match: { isAdmin: false } },
+    // { $group: { _id: { name: "$name", phone: "$phone" } } },
+    { $group: { _id: { name: "$name", isAdmin: "$isAdmin" } } },
+    { $sort: { "_id.name": 1 } },
+    // { $count: "name" },
   ]);
-  res.status(200).json({ status: true, data: data });
   console.log(data);
+  if (data) {
+    res.status(200).json({ status: true, data: data });
+  } else {
+    res.status(400).json({ status: false, message: "unable to find" });
+  }
 };
 
 const displayUsers = async (
@@ -282,9 +303,6 @@ const searchUser = async (req: Request, res: Response, next: NextFunction) => {
                 $options: "xi",
               },
               isAdmin: false,
-              // isAdmin: {
-              //   $regex: false,
-              // },
             },
           ],
         }),
@@ -301,9 +319,14 @@ const searchUser = async (req: Request, res: Response, next: NextFunction) => {
         .limitFields()
         .paginate();
     }
+
     let doc = await features.query;
 
     res.status(200).json({
+      countType: await Users.find({
+        name: { $regex: searchTerm, $options: "xi" },
+        isAdmin: false,
+      }).countDocuments(),
       result: doc.length,
       total: documentCount,
       data: doc,

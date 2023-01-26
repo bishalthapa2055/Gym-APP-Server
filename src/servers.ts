@@ -15,6 +15,7 @@ import adminRoutes from "./routes/adminRoutes";
 // import verifyPhone from "./middleware/verifyPhone";
 import { Users } from "./routes/Users";
 import { web } from "./routes/Admin";
+import { BadRequestError } from "./errors/bad_request_error";
 
 const app = express();
 app.use(cors());
@@ -48,6 +49,7 @@ mongoose
   })
   .catch((err: any) => {
     console.log(`Error: ${err}`);
+    throw new BadRequestError("Faild to connect to database");
   });
 // app.listen(() => {
 //   console.log(`server started at http://localhost:${config.server.port}`);
