@@ -72,6 +72,7 @@ UserSchema.index(
   { name: "text", phone: "text", email: "text" },
   { weights: { name: 10, phone: 10, email: 10 } }
 );
+// UserSchema.index({ title: "text", subtitle: "text", model_type: "text" });
 
 export default mongoose.model<IUsersModel>("Users", UserSchema);
 

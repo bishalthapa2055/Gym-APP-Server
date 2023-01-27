@@ -4,6 +4,7 @@ import Users from "../models/Users";
 import { BadRequestError } from "../errors/bad_request_error";
 import moment from "moment";
 import { ApiFeatures } from "../utils/api-services";
+import { countReset } from "console";
 // import decodeIDToken from "../authenticationToken";
 
 const createUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -321,12 +322,20 @@ const searchUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     let doc = await features.query;
+    // console.log(doc);
+    console.log(typeof searchTerm);
+
+    // model_type === "UBT" || model_type === "CBT"
+    //   ? await ModelSet.find({
+    //       $text: { $search: model_type },
+    //       status: "published",
+    //     }).countDocuments()
+    //   : documentCount,
 
     res.status(200).json({
-      countType: await Users.find({
-        name: { $regex: searchTerm, $options: "xi" },
-        isAdmin: false,
-      }).countDocuments(),
+      // countType: Users.find({
+      //   $text: { $search: searchTerm },
+      // }).countDocuments(),
       result: doc.length,
       total: documentCount,
       data: doc,

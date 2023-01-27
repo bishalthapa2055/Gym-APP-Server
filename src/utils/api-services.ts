@@ -40,8 +40,11 @@ class ApiFeatures {
 
     // 1B) Advanced filtering
     let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-
+    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    queryStr = queryStr.replace(
+      /^(?=.*[A-Za-z0-9])[A-Za-z0-9\s]*$/,
+      (match) => `$${match}`
+    );
     this.query = this.query.find(JSON.parse(queryStr));
 
     return this;
