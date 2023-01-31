@@ -77,9 +77,33 @@ const aggregrate = async (req: Request, res: Response, next: NextFunction) => {
     // { $count: "_id" },
     // { $match: { isAdmin: false } },
     // { $group: { _id: { name: "$name", phone: "$phone" } } },
-    { $group: { _id: { name: "$name", isAdmin: "$isAdmin" } } },
-    { $sort: { "_id.name": 1 } },
+    // { $group: { _id: { name: "$name", isAdmin: "$isAdmin" } } },
+    // { $sort: { "_id.name": 1 } },
+    // for projet agg
+    // {
+    //   $project: {
+    //     id: 0,
+    //     // isAdmin: 1,
+    //     info: {
+    //       name: "$name",
+    //       phone: "$phone",
+    //     },
+    //   },
+    // },
     // { $count: "name" },
+
+    // { $limit: 2 },
+    // { $match: { isAdmin: !true } },
+    // { $group: { _id: { name: "$name", email: "$email" } } },
+
+    //asum
+
+    // { $group: { _id: "$name", count: { $sum: 1 } } },
+
+    // tye
+    // { $type: { name: "$name" } },
+
+    { $project: { name: 1, _id: 0, email: { $type: "$email" } } },
   ]);
   console.log(data);
   if (data) {

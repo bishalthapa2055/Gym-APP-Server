@@ -9,7 +9,7 @@ export interface IPackages {
   duration_in_days: string;
   name: string;
   photo_url?: "";
-  price: string;
+  price: number;
   status: Typestatus;
 }
 
@@ -18,7 +18,7 @@ export interface IPackagesModel extends IPackages, Document {
   duration_in_days: string;
   name: string;
   photo_url?: "";
-  price: string;
+  price: number;
   status: Typestatus;
   created_at: Date;
   updated_at: Date;
@@ -46,7 +46,7 @@ const PackagesSchema: Schema = new Schema(
         "https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fbitpointx.s3-ap-southeast-1.amazonaws.com%2Fconfig%2Ftransparent_logo.png",
     },
     price: {
-      type: String,
+      type: Number,
       required: true,
     },
     status: {

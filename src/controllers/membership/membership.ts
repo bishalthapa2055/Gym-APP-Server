@@ -248,6 +248,72 @@ const paginateMembership = async (
   //   );
   // }
 };
+
+const findSum = async (req: Request, res: Response) => {
+  // processing for summ
+
+  try {
+    const data = await Membership.find({}).populate("package", "price");
+
+    console.log("data", data);
+
+    const mapper = data.map((item) => {
+      console.log(item.package);
+      return item.package;
+    });
+    // console.log("maper", mapper);
+    const sum = mapper.reduce((accumulator, items: any) => {
+      return accumulator + items.price;
+    }, 0);
+    res.status(200).json({ status: true, data: sum });
+  } catch (e) {
+    res
+      .status(400)
+      .json({ status: false, message: "Unable to find total Earning" });
+  }
+};
+
+const checkDate = async (req: Request, res: Response) => {
+  //processing for datevalidity checking
+
+  try {
+    const data = await Membership.find();
+
+    let date = new Date();
+    let options: any = {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      timeZoneName: "short",
+    };
+    let formattedDate = date.toLocaleString("en-US", options);
+
+    let dateStamp = new Date(formattedDate);
+
+    let unixTimestamp = dateStamp.getTime() / 1000;
+
+    const arr: any = [];
+    const numbers = data.map((item) => {
+      // var count = 0;
+
+      if (Number(item.end_date) >= unixTimestamp) {
+        // console.log(item.end_date);
+        arr.push(item.end_date);
+        return item.end_date;
+      }
+    });
+    // console.log("numbers", numbers);
+    // console.log("arr", arr.length);
+
+    res.status(200).json({ status: true, data: numbers, count: arr.length });
+  } catch (error) {
+    res.status(400).json({ status: false, message: "No Available data" });
+  }
+};
 export default {
   displayMembership,
   addMembership,
@@ -259,4 +325,6 @@ export default {
   displayMyMembership,
   countMembership,
   paginateMembership,
+  findSum,
+  checkDate,
 };

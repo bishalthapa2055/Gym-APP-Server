@@ -233,6 +233,29 @@ const searchPublishedPackage = async (
         : "failed to get Packages "
     );
   }
+
+  /*
+
+ModelSet.find({
+          $or: [
+            {
+              title: {
+                $regex: `/\b${searchTerm}\b/i`,
+                $options: "xi",
+              },
+            },
+            {
+              status: {
+                $eq: "published",
+              },
+            },
+          ],
+        }),
+        req.query
+      )
+
+
+*/
 };
 
 const searchPackages = async (

@@ -18,4 +18,6 @@ router.put("/membershipss/:id", Membership.updateMembershipPackage);
 router.patch("/memberships/:id", Membership.patchMembership);
 router.delete("/memberships/:id", Membership.deleteMembership);
 router.get("memberships/search", Membership.paginateMembership);
+router.get("/findsum", Membership.findSum);
+router.get("/checkdate", Membership.checkDate);
 export default router;

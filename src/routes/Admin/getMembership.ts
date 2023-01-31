@@ -22,6 +22,12 @@ router.get(
   verifyTokenAndIsAdmin,
   Membership.getIndividualMembership
 );
+router.get(
+  "/memberships/checkdates",
+  verifyTokenAndIsAdmin,
+  Membership.checkDate
+);
+router.get("/memberships/findsum", verifyTokenAndIsAdmin, Membership.findSum);
 router.patch(
   "/membership/:id",
   verifyTokenAndIsAdmin,
