@@ -4,6 +4,7 @@ import { BadRequestError } from "../../errors/bad_request_error";
 import Packages from "../../models/Packages";
 import Payment from "../../models/Payment";
 import { ApiFeatures } from "../../utils/api-services";
+import { ApiFeatures2 } from "../../utils/api-services2";
 
 const displayPackages = (req: Request, res: Response, next: NextFunction) => {
   Packages.find({}).exec((err, docs) => {
@@ -184,33 +185,65 @@ const searchPublishedPackage = async (
     const searchTerm = req.query.searchTerm as string | undefined;
 
     // advance features within users
-    let features: ApiFeatures;
+    let features: ApiFeatures2;
+    // if (searchTerm) {
+    //   features = new ApiFeatures2(
+    //     Packages.find({
+    //       $or: [
+    //         // {
+    //         //   name: {
+    //         //     $regex: searchTerm,
+    //         //     // $regex: `/\b${searchTerm}\b/i`,
+    //         //     $options: "xi",
+    //         //   },
+    //         //   // name: { name: new RegExp(searchTerm, "i") },
+
+    //         //   status: {
+    //         //     // $regex: "published",
+    //         //     // $options: "xi",
+    //         //     $eq: "published",
+    //         //     // $options: "xi",
+    //         //   },
+    //         //   // status: "published",
+    //         //   // u: id,
+    //         // },
+    //         { name: new RegExp(searchTerm, "i") },
+    //       ],
+    //     }),
+    //     req.query
+    //   )
+    //     .filter()
+    //     .sort()
+    //     .limitFields()
+    //     .paginate();
+    // }
     if (searchTerm) {
-      features = new ApiFeatures(
+      // console.log("searchTerm", searchTerm);
+      features = new ApiFeatures2(
         Packages.find({
-          $and: [
+          $or: [
             {
               name: {
-                $regex: searchTerm,
+                $regex: `/\b${searchTerm}\b/i`,
                 $options: "xi",
               },
+            },
+            {
               status: {
-                $regex: "published",
-                $options: "xi",
+                $eq: "published",
               },
-              // status: "published",
-              // u: id,
             },
           ],
         }),
         req.query
       )
+        // { $text: { $search: searchTerm } }
         .filter()
         .sort()
         .limitFields()
         .paginate();
     } else {
-      features = new ApiFeatures(
+      features = new ApiFeatures2(
         Packages.find({ status: "published" }),
         req.query
       )
@@ -236,6 +269,21 @@ const searchPublishedPackage = async (
 
   /*
 
+
+Student.find({
+          $or: [
+            { email: new RegExp(searchTerm, "i") },
+            { first_name: new RegExp(searchTerm, "i") },
+            { last_name: new RegExp(searchTerm, "i") },
+          ],
+        }),
+
+
+
+*/
+
+  /*
+
 ModelSet.find({
           $or: [
             {
@@ -258,6 +306,27 @@ ModelSet.find({
 */
 };
 
+const defaultSearch = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  //
+  const searchTerm = req.query.searchTerm as string;
+  const data = await Packages.find({
+    $or: [
+      { name: new RegExp(searchTerm, "i") },
+      // {
+      //   status: {
+      //     $regex: "published",
+      //   },
+      // },
+      // { status: "published" },
+    ],
+  });
+  // const data1 = await data.find({ status: "published" });
+  res.status(200).json({ status: true, data: data });
+};
 const searchPackages = async (
   req: Request,
   res: Response,
@@ -319,4 +388,5 @@ export default {
   updateStatus,
   searchPublishedPackage,
   searchPackages,
+  defaultSearch,
 };

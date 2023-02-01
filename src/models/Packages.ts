@@ -68,6 +68,7 @@ const PackagesSchema: Schema = new Schema(
   }
 );
 
+PackagesSchema.index({ name: "text" });
 export default mongoose.model<IPackagesModel>("Packages", PackagesSchema);
 
 // import mongoose, { ObjectId } from "mongoose";
