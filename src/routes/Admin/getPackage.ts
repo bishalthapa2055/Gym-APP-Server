@@ -5,6 +5,7 @@ import Packages from "../../controllers/packages/packages";
 const router = express.Router();
 
 router.get("/packages", verifyTokenAndIsAdmin, Packages.displayPackages);
+router.get("/packages/count", verifyTokenAndIsAdmin, Packages.CountPackages);
 router.post("/packages", verifyTokenAndIsAdmin, Packages.addPackages);
 router.delete("/packages/:id", verifyTokenAndIsAdmin, Packages.deletePackages);
 router.get(

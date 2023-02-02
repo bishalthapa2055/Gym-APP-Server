@@ -306,7 +306,10 @@ const checkDateActive = async (req: Request, res: Response) => {
     const numbers = data.map((item) => {
       // var count = 0;
 
-      if (Number(item.end_date) >= unixTimestamp) {
+      if (
+        Number(item.end_date) >= unixTimestamp &&
+        Number(item.start_date) <= unixTimestamp
+      ) {
         // console.log(item.end_date);
         arr.push(item.end_date);
         activeMembershipsList.push(item);
@@ -349,14 +352,17 @@ const checkDateInActive = async (req: Request, res: Response) => {
 
     let unixTimestamp = dateStamp.getTime() / 1000;
 
-    console.log(data.length);
+    // console.log(data.length);
     const arr: any = [];
     const inactiveMembershipsList: any = [];
 
     const numbers = data.map((item) => {
       // var count = 0;
 
-      if (Number(item.end_date) < unixTimestamp) {
+      if (
+        // Number(item.end_date) < unixTimestamp &&
+        Number(item.start_date) > unixTimestamp
+      ) {
         // console.log(item.end_date);
         arr.push(item.end_date);
         inactiveMembershipsList.push(item);
@@ -369,6 +375,56 @@ const checkDateInActive = async (req: Request, res: Response) => {
     res
       .status(200)
       .json({ status: true, count: arr.length, data: inactiveMembershipsList });
+  } catch (error) {
+    res.status(400).json({ status: false, message: "No Available data" });
+  }
+};
+const checkDateExpired = async (req: Request, res: Response) => {
+  //processing for datevalidity checking
+
+  try {
+    const data = await Membership.find({})
+      .populate("userId", "name")
+      .populate("package", "name price")
+      .populate("payment", "paid_via");
+
+    let date = new Date();
+    let options: any = {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      timeZoneName: "short",
+    };
+    let formattedDate = date.toLocaleString("en-US", options);
+
+    let dateStamp = new Date(formattedDate);
+
+    let unixTimestamp = dateStamp.getTime() / 1000;
+
+    // console.log(data.length);
+    const arr: any = [];
+    const expiredMembershipsList: any = [];
+
+    const numbers = data.map((item) => {
+      // var count = 0;
+
+      if (Number(item.end_date) < unixTimestamp) {
+        // console.log(item.end_date);
+        arr.push(item.end_date);
+        expiredMembershipsList.push(item);
+        // console.log(item);
+        return item.end_date;
+      }
+      // console.log(item.end_date);
+    });
+
+    res
+      .status(200)
+      .json({ status: true, count: arr.length, data: expiredMembershipsList });
   } catch (error) {
     res.status(400).json({ status: false, message: "No Available data" });
   }
@@ -387,4 +443,5 @@ export default {
   findSum,
   checkDateActive,
   checkDateInActive,
+  checkDateExpired,
 };

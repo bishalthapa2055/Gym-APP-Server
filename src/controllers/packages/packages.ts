@@ -6,13 +6,27 @@ import Payment from "../../models/Payment";
 import { ApiFeatures } from "../../utils/api-services";
 import { ApiFeatures2 } from "../../utils/api-services2";
 
-const displayPackages = (req: Request, res: Response, next: NextFunction) => {
+const displayPackages = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  await Packages.find({}).exec((err, docs) => {
+    if (err) throw err;
+
+    res.status(200).json({ stautus: true, count: docs.length, data: docs });
+  });
+};
+
+const CountPackages = (req: Request, res: Response, next: NextFunction) => {
+  //count packages
   Packages.find({}).exec((err, docs) => {
     if (err) throw err;
 
-    res.status(200).json({ stautus: true, data: docs });
+    res.status(200).json({ stautus: true, count: docs.length });
   });
 };
+
 const addPackages = async (req: Request, res: Response, next: NextFunction) => {
   const packages = new Packages({
     //user-> model
@@ -389,4 +403,5 @@ export default {
   searchPublishedPackage,
   searchPackages,
   defaultSearch,
+  CountPackages,
 };

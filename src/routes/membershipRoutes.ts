@@ -20,5 +20,6 @@ router.delete("/memberships/:id", Membership.deleteMembership);
 router.get("memberships/search", Membership.paginateMembership);
 router.get("/findsum", Membership.findSum);
 router.get("/checkdateactive", Membership.checkDateActive);
+router.get("/checkdateexpired", Membership.checkDateExpired);
 router.get("/checkdateinactive", Membership.checkDateInActive);
 export default router;
