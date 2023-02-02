@@ -25,7 +25,7 @@ router.get(
 router.get(
   "/memberships/checkdates",
   verifyTokenAndIsAdmin,
-  Membership.checkDate
+  Membership.checkDateActive
 );
 router.get("/memberships/findsum", verifyTokenAndIsAdmin, Membership.findSum);
 router.patch(
