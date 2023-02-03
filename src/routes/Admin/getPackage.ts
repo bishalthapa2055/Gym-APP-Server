@@ -6,6 +6,11 @@ const router = express.Router();
 
 router.get("/packages", verifyTokenAndIsAdmin, Packages.displayPackages);
 router.get("/packages/count", verifyTokenAndIsAdmin, Packages.CountPackages);
+router.get(
+  "/packages/countactivepackages",
+  verifyTokenAndIsAdmin,
+  Packages.countActivePackages
+);
 router.post("/packages", verifyTokenAndIsAdmin, Packages.addPackages);
 router.delete("/packages/:id", verifyTokenAndIsAdmin, Packages.deletePackages);
 router.get(

@@ -389,7 +389,17 @@ const searchPackages = async (
     );
   }
 };
+const countActivePackages = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  await Packages.find({ status: "published" }).exec((err, docs) => {
+    if (err) throw err;
 
+    res.status(200).json({ stautus: true, count: docs.length });
+  });
+};
 export default {
   displayPackages,
   addPackages,
@@ -404,4 +414,5 @@ export default {
   searchPackages,
   defaultSearch,
   CountPackages,
+  countActivePackages,
 };

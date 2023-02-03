@@ -256,13 +256,22 @@ const findSum = async (req: Request, res: Response) => {
     const data = await Membership.find({}).populate("package", "price");
 
     console.log("data", data);
-
+    // console.log(data?.price);
     const mapper = data.map((item) => {
-      console.log(item.package);
+      // console.log(item.package);
+      // console.log("price", item.price);
       return item.package;
     });
     // console.log("maper", mapper);
     const sum = mapper.reduce((accumulator, items: any) => {
+      // console.log(items.price);
+      console.log(items);
+      if (items === null) {
+        return accumulator + items.price;
+      }
+      // if (items.price === null) {
+      //   return false;
+      // }
       return accumulator + items.price;
     }, 0);
     res.status(200).json({ status: true, data: sum });

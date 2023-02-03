@@ -48,6 +48,7 @@ const PackagesSchema: Schema = new Schema(
     price: {
       type: Number,
       required: true,
+      Default:0,
     },
     status: {
       type: String,
