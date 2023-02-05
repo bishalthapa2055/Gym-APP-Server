@@ -262,18 +262,20 @@ const findSum = async (req: Request, res: Response) => {
       // console.log("price", item.price);
       return item.package;
     });
-    // console.log("maper", mapper);
-    const sum = mapper.reduce((accumulator, items: any) => {
-      // console.log(items.price);
-      console.log(items);
-      if (items === null) {
+    console.log("maper", mapper);
+    const sum = mapper
+      .filter((value: any) => value !== null)
+      .reduce((accumulator, items: any) => {
+        // console.log(items.price);
+        console.log(items);
+        // if (items === null) {
+        //   return accumulator + items.price;
+        // }
+        // if (items.price === null) {
+        //   return false;
+        // }
         return accumulator + items.price;
-      }
-      // if (items.price === null) {
-      //   return false;
-      // }
-      return accumulator + items.price;
-    }, 0);
+      }, 0);
     res.status(200).json({ status: true, data: sum });
   } catch (e) {
     res
