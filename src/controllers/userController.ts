@@ -277,7 +277,9 @@ const countUser = async (req: Request, res: Response, next: NextFunction) => {
 const login = async (req: Request, res: Response, next: NextFunction) => {
   //login credentials
   const number = res.locals.number.name;
+  console.log("🚀 ~ file: userController.ts:280 ~ login ~ number", number);
   const data = res.locals.number;
+  console.log("🚀 ~ file: userController.ts:282 ~ login ~ data", data);
   // console.log(number);
   try {
     if (number) {

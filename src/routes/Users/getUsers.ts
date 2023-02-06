@@ -8,7 +8,7 @@ router.get("/users", verifyTokenAndAuthorization, usersDetails.displayMe);
 router.patch(
   "/users",
   verifyTokenAndAuthorization,
-  upload,
+  // upload,
   usersDetails.updateMyDetails
 );
 router.get("/login", verifyTokenAndAuthorization, usersDetails.login);

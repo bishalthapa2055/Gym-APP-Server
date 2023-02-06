@@ -255,19 +255,19 @@ const findSum = async (req: Request, res: Response) => {
   try {
     const data = await Membership.find({}).populate("package", "price");
 
-    console.log("data", data);
+    // console.log("data", data);
     // console.log(data?.price);
     const mapper = data.map((item) => {
       // console.log(item.package);
       // console.log("price", item.price);
       return item.package;
     });
-    console.log("maper", mapper);
+    // console.log("maper", mapper);
     const sum = mapper
       .filter((value: any) => value !== null)
       .reduce((accumulator, items: any) => {
         // console.log(items.price);
-        console.log(items);
+        // console.log(items);
         // if (items === null) {
         //   return accumulator + items.price;
         // }
