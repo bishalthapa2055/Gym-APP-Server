@@ -71,7 +71,7 @@ function startServer() {
   app.use("/api/phone", Users);
   app.use("/api/web", web);
   app.get("/", (req, res) => {
-    res.send({ status: true, message: "Server is Live" });
+    res.send({ status: true, message: "Server is Live From  Backend Server" });
   });
   app.all("*", (req, res) => {
     res.status(400).json({ status: false, message: "Not valid route" });
