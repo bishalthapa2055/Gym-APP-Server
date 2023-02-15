@@ -107,6 +107,11 @@ const verifyTokenAndAuthorization = (
         } else {
           console.log(data);
           res.locals.number = data;
+          // console.log(
+          //   "🚀 ~ file: authenticationToken.ts:110 ~ Users.findOne ~ res.locals.number ",
+          //   res.locals.number
+          // );
+
           next();
         }
         // } catch (err) {

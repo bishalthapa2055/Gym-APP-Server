@@ -216,6 +216,7 @@ const deleteUsers = async (req: Request, res: Response, next: NextFunction) => {
 
 const displayMe = (req: Request, res: Response, next: NextFunction) => {
   const number = res.locals.number.phone;
+  console.log("🚀 ~ file: userController.ts:219 ~ displayMe ~ number", number);
 
   Users.findOne({ phone: number }, (err: any, data: any) => {
     if (err) {

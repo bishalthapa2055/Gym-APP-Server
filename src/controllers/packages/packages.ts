@@ -116,20 +116,26 @@ const deletePackages = async (
     });
 };
 
-const getMyPackage = (req: Request, res: Response, next: NextFunction) => {
+const getMyPackage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   //get my package details\
   const objId = res.locals.number.id.trim();
   console.log(objId, ["data"]);
   // Packages.find({});
-  Payment.find({ userId: objId })
-    .populate("packages")
+  await Payment.find({ userId: objId })
+    .populate("package", "name")
     .exec((err: any, docs: any) => {
+      console.log("err", err);
       if (err)
         res.status(400).json({ status: false, message: "cannot find details" });
       else {
         // Packages.find({id:})
         console.log(docs, ["payment"]);
-        let packageId = docs.map((item: any) => item.packages);
+        let packageId = docs.map((item: any) => item.package);
+
         // packageId.id.toString();
         console.log(packageId, ["package"]);
         Packages.findById(packageId, (err: any, docs: any) => {

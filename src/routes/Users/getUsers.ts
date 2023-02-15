@@ -11,6 +11,6 @@ router.patch(
   // upload,
   usersDetails.updateMyDetails
 );
-router.get("/login", verifyTokenAndAuthorization, usersDetails.login);
+router.post("/login", verifyTokenAndAuthorization, usersDetails.login);
 
 export { router as getUsers };

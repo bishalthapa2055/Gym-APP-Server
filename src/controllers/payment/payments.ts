@@ -135,15 +135,16 @@ const getIndividualPayment = async (
 };
 const displayMyPayments = (req: Request, res: Response, next: NextFunction) => {
   const objId = res.locals.number.id.trim();
+  console.log("🚀 ~ file: payments.ts:138 ~ displayMyPayments ~ objId", objId);
   // Payment.find({ userId: objId });
-  Payment.find({ userId: objId })
+  Payment.findOne({ userId: objId })
     // .populate("userId", "email")
     // .populate("processed_by", "email")
-    .populate("packages", "name")
-    .then((data) => {
+    .populate("package", "name")
+    .then((data: any) => {
       res.status(200).json({ status: true, data: data });
     })
-    .catch((e) => res.status(400).json({ status: false, Error: e }));
+    .catch((e: any) => res.status(400).json({ status: false, Error: e }));
 };
 export default {
   displayPayment,
