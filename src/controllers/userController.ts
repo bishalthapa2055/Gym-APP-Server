@@ -5,6 +5,7 @@ import { BadRequestError } from "../errors/bad_request_error";
 import moment from "moment";
 import { ApiFeatures } from "../utils/api-services";
 import { countReset } from "console";
+import { check } from "express-validator";
 // import decodeIDToken from "../authenticationToken";
 
 const createUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -470,5 +471,5 @@ export default {
   admin,
   searchUser,
   nameSearch,
-  createUserHimself
+  createUserHimself,
 };
