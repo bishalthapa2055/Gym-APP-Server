@@ -375,7 +375,12 @@ const searchUser = async (req: Request, res: Response, next: NextFunction) => {
 };
 const nameSearch = async (req: Request, res: Response) => {
   try {
+    const phoneNumberRegex = /^\+977[0-9]{9}$/;
     const { number } = req.body;
+
+    if (!phoneNumberRegex.test(number)) {
+      throw new BadRequestError("Number must stars with +977");
+    }
     if (!number) {
       throw new BadRequestError("Please send Number");
     }
@@ -405,5 +410,5 @@ export default {
   login,
   admin,
   searchUser,
-  nameSearch
+  nameSearch,
 };
