@@ -12,5 +12,7 @@ router.patch(
   usersDetails.updateMyDetails
 );
 router.post("/login", verifyTokenAndAuthorization, usersDetails.login);
+router.post("/namesearch", usersDetails.nameSearch);
+
 
 export { router as getUsers };

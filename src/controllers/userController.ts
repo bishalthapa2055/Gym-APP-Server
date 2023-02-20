@@ -373,6 +373,25 @@ const searchUser = async (req: Request, res: Response, next: NextFunction) => {
     );
   }
 };
+const nameSearch = async (req: Request, res: Response) => {
+  try {
+    const { number } = req.body;
+    if (!number) {
+      throw new BadRequestError("Please send Number");
+    }
+    const data = await Users.findOne({ phone: number }).select("name phone");
+    if (!data) {
+      throw new BadRequestError("Unable to Find Number");
+    }
+
+    res.status(200).json({ status: true, data: data });
+  } catch (error) {
+    res.status(400).json({
+      status: false,
+      error: (error as any).message ? (error as any).message : "Debug Backend",
+    });
+  }
+};
 export default {
   createUsers,
   displayUsers,
@@ -386,4 +405,5 @@ export default {
   login,
   admin,
   searchUser,
+  nameSearch
 };
