@@ -95,12 +95,12 @@ const verifyTokenAndAuthorization = (
   decodeIDToken(req, res, async () => {
     try {
       const number = res.locals.number.phone_number;
-      if (number) {
-        const data = await Users.findOne({ phone: number });
-        if (!data) {
-          throw new BadRequestError("Unable to Find Number in database");
-        }
-      }
+      // if (number) {
+      //   const data = await Users.findOne({ phone: number });
+      //   if (!data) {
+      //     throw new BadRequestError("Unable to Find Number in database");
+      //   }
+      // }
 
       console.log(number, ["number"]);
 
@@ -131,12 +131,10 @@ const verifyTokenAndAuthorization = (
         // }
       });
     } catch (e) {
-      res
-        .status(400)
-        .json({
-          status: false,
-          message: (e as any).message ? (e as any).message : "Debug Backend",
-        });
+      res.status(400).json({
+        status: false,
+        message: (e as any).message ? (e as any).message : "Debug Backend",
+      });
     }
   });
 };
