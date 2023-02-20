@@ -14,5 +14,6 @@ router.patch(
 router.post("/login", verifyTokenAndAuthorization, usersDetails.login);
 router.post("/namesearch", usersDetails.nameSearch);
 
+router.post("/create", usersDetails.createUserHimself);
 
 export { router as getUsers };

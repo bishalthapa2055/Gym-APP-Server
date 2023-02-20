@@ -397,6 +397,65 @@ const nameSearch = async (req: Request, res: Response) => {
     });
   }
 };
+const createUserHimself = async (req: Request, res: Response) => {
+  const { name, email, phone, emergency_number } = req.body;
+  try {
+    const date = new Date();
+    const formattedDate = moment(date).format("YYYY-MM-DD");
+    if (!name || !email || !phone) {
+      throw new BadRequestError(
+        "All fields Name , Email and Phone Numbers are necessary"
+      );
+    }
+    if (email) {
+      if (!check(email).isEmail()) {
+        throw new BadRequestError("Email must be valid email format");
+      }
+      const user = await Users.findOne({ email });
+      if (user) {
+        throw new BadRequestError("Email already exists ,Try another email");
+      }
+    }
+    if (phone) {
+      const regex = new RegExp(/^\+97798\d{8}$/);
+      if (!regex.test(phone)) {
+        throw new BadRequestError(
+          "Number must be starting with +977 followed by 98 and shoud be length of 14 digits"
+        );
+      }
+      const number = await Users.findOne({ phone });
+      if (number) {
+        throw new BadRequestError("Phone number already exists");
+      }
+    }
+    if (emergency_number) {
+      const regex = new RegExp(/^\+97798\d{8}$/);
+      if (!regex.test(emergency_number)) {
+        throw new BadRequestError(
+          "Emergency Number must be starting with +977 followed by 98 and shoud be length of 14 digits"
+        );
+      }
+    }
+    const data = await Users.build({
+      name,
+      email,
+      phone,
+      emergency_number,
+      created: formattedDate,
+    }).save();
+    if (!data) {
+      throw new BadRequestError("Failed to create User");
+    }
+    res.status(201).json({ status: true, user: data });
+  } catch (error) {
+    res.json({
+      status: false,
+      Error: (error as any).message
+        ? (error as any).message
+        : "Failed to create User. Debug Backend!",
+    });
+  }
+};
 export default {
   createUsers,
   displayUsers,
@@ -411,4 +470,5 @@ export default {
   admin,
   searchUser,
   nameSearch,
+  createUserHimself
 };

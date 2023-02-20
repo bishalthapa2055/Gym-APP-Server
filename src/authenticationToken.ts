@@ -91,11 +91,11 @@ const verifyTokenAndAuthorization = (
   res: Response,
   next: NextFunction
 ) => {
-  decodeIDToken(req, res, () => {
+  decodeIDToken(req, res, async () => {
     const number = res.locals.number.phone_number;
     console.log(number, ["number"]);
     try {
-      Users.findOne({ phone: number }, (err: any, data: any) => {
+      await Users.findOne({ phone: number }, (err: any, data: any) => {
         // try {
         // console.log(phone);
         if (err) {
