@@ -93,48 +93,45 @@ const verifyTokenAndAuthorization = (
   next: NextFunction
 ) => {
   decodeIDToken(req, res, async () => {
+    const number = res.locals.number.phone_number;
     try {
-      const number = res.locals.number.phone_number;
-      // if (number) {
-      //   const data = await Users.findOne({ phone: number });
-      //   if (!data) {
-      //     throw new BadRequestError("Unable to Find Number in database");
+      const data = await Users.findOne({ phone: number });
+      if (!data) {
+        throw new BadRequestError("Unable to find user data ");
+      }
+
+      res.locals.number = data;
+      next();
+      // await Users.findOne({ phone: number }, (err: any, data: any) => {
+      //   // try {
+      //   // console.log(phone);
+      //   if (err) {
+      //     // console.log(err, ["err"]);
+      //     res
+      //       .status(400)
+      //       .json({ status: false, message: "Cannot found user data" });
+      //     // throw new Error("Cannot find data");
+      //   } else {
+      //     console.log(data);
+      //     res.locals.number = data;
+      //     // console.log(
+      //     //   "🚀 ~ file: authenticationToken.ts:110 ~ Users.findOne ~ res.locals.number ",
+      //     //   res.locals.number
+      //     // );
+
+      //     next();
       //   }
-      // }
-
-      console.log(number, ["number"]);
-
-      await Users.findOne({ phone: number }, (err: any, data: any) => {
-        // try {
-        // console.log(phone);
-        if (err) {
-          // console.log(err, ["err"]);
-          res
-            .status(400)
-            .json({ status: false, message: "Cannot found user data" });
-          // throw new Error("Cannot find data");
-        } else {
-          console.log(data);
-          res.locals.number = data;
-          // console.log(
-          //   "🚀 ~ file: authenticationToken.ts:110 ~ Users.findOne ~ res.locals.number ",
-          //   res.locals.number
-          // );
-
-          next();
-        }
-        // } catch (err) {
-        // console.log("Error :" + err);
-        // res
-        // .status(400)
-        // .json({ status: false, message: "Cannot find Valid users" });
-        // }
-      });
+      //   // } catch (err) {
+      //   // console.log("Error :" + err);
+      //   // res
+      //   // .status(400)
+      //   // .json({ status: false, message: "Cannot find Valid users" });
+      //   // }
+      // });
     } catch (e) {
-      res.status(400).json({
-        status: false,
-        message: (e as any).message ? (e as any).message : "Debug Backend",
-      });
+      res
+        .status(400)
+        .json({ status: false, message: "Cannot View Your Details" });
     }
   });
 };

@@ -214,21 +214,32 @@ const deleteUsers = async (req: Request, res: Response, next: NextFunction) => {
     }
   });
 };
-
-const displayMe = (req: Request, res: Response, next: NextFunction) => {
+const displayMe = async (req: Request, res: Response, next: NextFunction) => {
   const number = res.locals.number.phone;
   console.log("🚀 ~ file: userController.ts:219 ~ displayMe ~ number", number);
-
-  Users.findOne({ phone: number }, (err: any, data: any) => {
-    if (err) {
-      res
-        .status(400)
-        .json({ status: false, message: "Not valid users", Error: err });
-    } else {
-      res.status(200).json({ status: true, data: data });
+  try {
+    const data = await Users.findOne({ phone: number });
+    //    (err: any, data: any) => {
+    //   if (err) {
+    //     res
+    //       .status(400)
+    //       .json({ status: false, message: "Not valid users", Error: err });
+    //   } else {
+    //     res.status(200).json({ status: true, data: data });
+    //   }
+    // });
+    if (!data) {
+      throw new BadRequestError("Unable to find User");
     }
-  });
+    res.status(200).json({ status: true, data: data });
+  } catch (error) {
+    res.status(400).json({
+      status: false,
+      Error: (error as any).message ? (error as any).message : "Debug Backend",
+    });
+  }
 };
+
 
 const updateMyDetails = (req: Request, res: Response, next: NextFunction) => {
   const objId = res?.locals?.number.id.trim();
