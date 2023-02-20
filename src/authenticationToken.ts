@@ -4,6 +4,7 @@ import Users from "./models/Users";
 import jwt from "jsonwebtoken";
 import { async } from "@firebase/util";
 import { NotAuthorizedError } from "./errors/not_authorized_error";
+import { BadRequestError } from "./errors/bad_request_error";
 
 const serviceAccount = require("./serviceAccount.json");
 admin.initializeApp({
@@ -92,9 +93,17 @@ const verifyTokenAndAuthorization = (
   next: NextFunction
 ) => {
   decodeIDToken(req, res, async () => {
-    const number = res.locals.number.phone_number;
-    console.log(number, ["number"]);
     try {
+      const number = res.locals.number.phone_number;
+      if (number) {
+        const data = await Users.findOne({ phone: number });
+        if (!data) {
+          throw new BadRequestError("Unable to Find Number in database");
+        }
+      }
+
+      console.log(number, ["number"]);
+
       await Users.findOne({ phone: number }, (err: any, data: any) => {
         // try {
         // console.log(phone);
@@ -124,7 +133,10 @@ const verifyTokenAndAuthorization = (
     } catch (e) {
       res
         .status(400)
-        .json({ status: false, message: "Cannot View Your Details" });
+        .json({
+          status: false,
+          message: (e as any).message ? (e as any).message : "Debug Backend",
+        });
     }
   });
 };
