@@ -218,7 +218,7 @@ const displayMe = async (req: Request, res: Response, next: NextFunction) => {
   const number = res.locals.number.phone;
   console.log("🚀 ~ file: userController.ts:219 ~ displayMe ~ number", number);
   try {
-    const data = await Users.findOne({ phone: number });
+    const data = await Users.findOne({ number });
     //    (err: any, data: any) => {
     //   if (err) {
     //     res
@@ -239,7 +239,6 @@ const displayMe = async (req: Request, res: Response, next: NextFunction) => {
     });
   }
 };
-
 
 const updateMyDetails = (req: Request, res: Response, next: NextFunction) => {
   const objId = res?.locals?.number.id.trim();
