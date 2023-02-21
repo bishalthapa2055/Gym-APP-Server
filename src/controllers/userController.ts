@@ -391,15 +391,21 @@ const searchUser = async (req: Request, res: Response, next: NextFunction) => {
 };
 const nameSearch = async (req: Request, res: Response) => {
   try {
-    const phoneNumberRegex = /\+977\d{8}/;
-    const { number } = req.body;
+    const number = req.body.phone;
 
-    if (!phoneNumberRegex.test(number)) {
-      throw new BadRequestError("Number must stars with +977");
-    }
     if (!number) {
       throw new BadRequestError("Please send Number");
     }
+    const regex = new RegExp(/^\+97798\d{8}$/);
+    if (!regex.test(number)) {
+      throw new BadRequestError(
+        "Number must be starting with +977 followed by 98 and shoud be length of 14 digits"
+      );
+    }
+
+    // if (!phoneNumberRegex.test(number)) {
+    //   throw new BadRequestError("Number must stars with +977");
+    // }
     const data = await Users.findOne({ phone: number }).select("name phone");
     if (!data) {
       throw new BadRequestError("Unable to Find Number");
