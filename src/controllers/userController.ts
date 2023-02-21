@@ -215,10 +215,15 @@ const deleteUsers = async (req: Request, res: Response, next: NextFunction) => {
   });
 };
 const displayMe = async (req: Request, res: Response, next: NextFunction) => {
+  console.log(
+    "🚀 ~ file: userController.ts:218 ~ displayMe ~ displayMe:",
+    displayMe
+  );
   const number = res.locals.number.phone;
   console.log("🚀 ~ file: userController.ts:219 ~ displayMe ~ number", number);
   try {
-    const data = await Users.findOne({ number });
+    const data = await Users.findOne({ phone: number });
+    console.log("🚀 ~ file: userController.ts:223 ~ displayMe ~ data:", data);
     //    (err: any, data: any) => {
     //   if (err) {
     //     res
