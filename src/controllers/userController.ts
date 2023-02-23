@@ -406,7 +406,7 @@ const nameSearch = async (req: Request, res: Response) => {
     // if (!phoneNumberRegex.test(number)) {
     //   throw new BadRequestError("Number must stars with +977");
     // }
-    const data = await Users.findOne({ phone: number }).select("name phone");
+    const data = await Users.findOne({ phone: number }).select("name phone image");
     if (!data) {
       throw new BadRequestError("Unable to Find Number");
     }
