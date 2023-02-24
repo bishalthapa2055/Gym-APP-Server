@@ -470,7 +470,7 @@ const createUserHimself = async (req: Request, res: Response) => {
     }
     res.status(201).json({ status: true, user: data });
   } catch (error) {
-    res.json({
+    res.status(400).json({
       status: false,
       Error: (error as any).message
         ? (error as any).message
